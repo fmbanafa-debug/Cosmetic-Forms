@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Journey into Cosmeceutical Forms</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8;
+        }
+        .main-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        .category-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin: 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            border: 1px solid #e2e8f0;
+        }
+        .category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -2px rgb(0 0 0 / 0.1);
+        }
+        .category-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1e3a8a; /* Deep Blue */
+        }
+        .sub-category-grid {
+            display: none;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        .sub-category-item {
+            background-color: #eff6ff; /* Light Blue */
+            color: #1e3a8a; /* Deep Blue */
+            padding: 1rem;
+            border-radius: 0.75rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-weight: 600;
+        }
+        .sub-category-item:hover {
+            background-color: #dbeafe; /* Lighter Blue on hover */
+        }
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+        .modal-container {
+            background: white;
+            border-radius: 1rem;
+            padding: 2.5rem;
+            width: 90%;
+            max-width: 600px;
+            transform: scale(0.9);
+            transition: all 0.3s ease;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-overlay.active .modal-container {
+            transform: scale(1);
+        }
+        .modal-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1e3a8a;
+            margin-bottom: 1rem;
+        }
+        .modal-section-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #172554; /* Darker Blue */
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+            border-bottom: 2px solid #93c5fd; /* Light Blue Border */
+            padding-bottom: 0.25rem;
+        }
+        .modal-content p, .modal-content ul {
+            color: #334155;
+            line-height: 1.6;
+        }
+        .modal-content ul {
+            list-style-type: disc;
+            padding-left: 1.5rem;
+        }
+        .sfda-focus {
+            background-color: #fffbeb; /* Light Yellow */
+            border-left: 4px solid #f59e0b; /* Amber */
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-top: 1rem;
+        }
+        .sfda-focus h4 {
+            color: #b45309; /* Dark Amber */
+            font-weight: 700;
+        }
+        .close-button {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: #e2e8f0;
+            border-radius: 50%;
+            width: 2.5rem;
+            height: 2.5rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .close-button:hover {
+            background-color: #cbd5e1;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+
+    <div class="main-container">
+        <div class="w-full max-w-5xl">
+            <header class="text-center mb-12">
+                <h1 class="text-4xl md:text-5xl font-bold text-gray-800">An Interactive Journey into Cosmeceutical Forms</h1>
+                <p class="text-lg text-gray-600 mt-4">Click on a category to explore its dosage forms and SFDA regulatory insights.</p>
+            </header>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Liquid Category -->
+                <div class="category-card" onclick="toggleSubCategory('liquid')">
+                    <h2 class="category-title">Liquid</h2>
+                    <div id="liquid" class="sub-category-grid">
+                        <div class="sub-category-item" onclick="event.stopPropagation(); showModal('solution')">Solution</div>
+                        <div class="sub-category-item" onclick="event.stopPropagation(); showModal('lotion')">Lotion</div>
+                        <div class="sub-category-item" onclick="event.stopPropagation(); showModal('suspension')">Suspension</div>
+                    </div>
+                </div>
+
+                <!-- Semi-solid Category -->
+                <div class="category-card" onclick="toggleSubCategory('semisolid')">
+                    <h2 class="category-title">Semi-solid</h2>
+                    <div id="semisolid" class="sub-category-grid">
+                        <div class="sub-category-item" onclick="event.stopPropagation(); showModal('cream')">Cream</div>
+                        <div class="sub-category-item" onclick="event.stopPropagation(); showModal('ointment')">Ointment</div>
+                        <div class="sub-category-item" onclick="event.stopPropagation(); showModal('paste')">Paste</div>
+                        <div class="sub-category-item" onclick="event.stopPropagation(); showModal('gel')">Gel</div>
+                    </div>
+                </div>
+
+                <!-- Solid Category -->
+                <div class="category-card" onclick="toggleSubCategory('solid')">
+                    <h2 class="category-title">Solid</h2>
+                    <div id="solid" class="sub-category-grid">
+                        <div class="sub-category-item" onclick="event.stopPropagation(); showModal('powder')">Powder</div>
+                        <div class="sub-category-item" onclick="event.stopPropagation(); showModal('capsule')">Capsule</div>
+                        <div class="sub-category-item" onclick="event.stopPropagation(); showModal('stick')">Stick</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Overlay -->
+    <div id="modal-overlay" class="modal-overlay" onclick="closeModal()">
+        <div class="modal-container" onclick="event.stopPropagation();">
+             <div class="close-button" onclick="closeModal()">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            </div>
+            <div id="modal-content-area">
+                <!-- Dynamic content will be injected here -->
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const modalData = {
+            solution: {
+                title: 'Solution',
+                description: 'Solutions are the simplest type of formulation, where active ingredients are dissolved in a solvent or vehicle.',
+                types: `<ul>
+                    <li><strong>Aqueous (Water-based):</strong> Vehicle is water. (e.g., eye makeup remover, hand soap, shampoos).</li>
+                    <li><strong>Hydroalcoholic:</strong> Vehicle is a mix of water and alcohol. (e.g., hair spray, mouthwash, facial toner).</li>
+                    <li><strong>Anhydrous (Waterless):</strong> Vehicle is an organic solvent or oily component. (e.g., nail polish remover, bath oils).</li>
+                </ul>`,
+                sfdaFocus: `<h4>SFDA Regulatory Considerations</h4>
+                <p>The SFDA will scrutinize solutions for:</p>
+                <ul>
+                    <li><strong>Preservative Efficacy Testing (PET):</strong> Especially for aqueous solutions to prevent microbial growth.</li>
+                    <li><strong>Stability Data:</strong> To ensure the active ingredients remain dissolved and stable over the shelf life.</li>
+                    <li><strong>Alcohol Content Declaration:</strong> Accurate labeling of alcohol percentage is required for hydroalcoholic solutions.</li>
+                    <li><strong>Safety of Solvents:</strong> For anhydrous solutions, all solvents must be approved and within safe concentration limits.</li>
+                </ul>`
+            },
+            lotion: {
+                title: 'Lotion',
+                description: 'Lotions are low-viscosity (thin) emulsions that behave as liquids. They are designed for easy application without heavy rubbing and are generally less greasy than creams.',
+                types: `<ul>
+                    <li>Often referred to as "milks" or "balms."</li>
+                    <li>Contain a higher amount of water in the continuous phase.</li>
+                    <li>Examples include facial cleansing milks, liquid foundations, aftershave balms, and non-aerosol sunscreen sprays.</li>
+                </ul>`,
+                sfdaFocus: `<h4>SFDA Regulatory Considerations</h4>
+                <p>For lotions, the SFDA focuses on:</p>
+                <ul>
+                    <li><strong>Emulsion Stability:</strong> Proof that the oil and water phases will not separate under normal storage conditions.</li>
+                    <li><strong>Microbiological Quality:</strong> Due to high water content, lotions must pass microbial limit tests.</li>
+                    <li><strong>Claims Substantiation:</strong> Any claims (e.g., "moisturizing," "sun protection") must be backed by efficacy data. SPF value requires rigorous testing.</li>
+                    <li><strong>Ingredient Disclosure:</strong> Full INCI list is mandatory, with allergens clearly noted if applicable.</li>
+                </ul>`
+            },
+            suspension: {
+                title: 'Suspension',
+                description: 'A dosage form for delivering insoluble solid ingredients distributed throughout a liquid medium. Thickeners are essential to prevent sedimentation.',
+                types: `<ul>
+                    <li><strong>Water-based:</strong> Common in some cosmetic treatments.</li>
+                    <li><strong>Hydroalcoholic:</strong> e.g., certain facial toners with suspended powders.</li>
+                    <li><strong>Anhydrous:</strong> e.g., silicone-based antiperspirant sprays, nail polishes, mascara, and liquid eyeliners containing pigments.</li>
+                </ul>`,
+                sfdaFocus: `<h4>SFDA Regulatory Considerations</h4>
+                <p>Key SFDA concerns for suspensions include:</p>
+                <ul>
+                    <li><strong>Particle Size and Distribution:</strong> Data on the size of suspended particles is crucial, especially for nanotechnology which has specific regulations.</li>
+                    <li><strong>Resuspendability:</strong> The product must be easily returned to a uniform state by shaking. This should be stated on the label.</li>
+                    <li><strong>Stability Testing:</strong> Must demonstrate that the suspension remains stable and does not "cake" (form a hard, non-resuspendable sediment).</li>
+                    <li><strong>Safety of Pigments/Insolubles:</strong> All color additives and solid particles must be approved by the SFDA for cosmetic use.</li>
+                </ul>`
+            },
+            cream: {
+                title: 'Cream',
+                description: 'Creams are high-viscosity, semisolid emulsions. They contain a higher oil phase content than lotions, making them generally more greasy and suitable for packing in jars or tubes.',
+                types: `<ul>
+                    <li><strong>Oil-in-Water (O/W):</strong> Less greasy feel, used for facial moisturizers and shaving creams.</li>
+                    <li><strong>Water-in-Oil (W/O):</strong> Greasier, more water-resistant, used for diaper rash products.</li>
+                    <li><strong>Water-in-Silicone (W/Si):</strong> Provides a unique, non-greasy, smooth feel. Used in foundations and some sunscreens.</li>
+                </ul>`,
+                sfdaFocus: `<h4>SFDA Regulatory Considerations</h4>
+                <p>The SFDA's review of creams will emphasize:</p>
+                <ul>
+                    <li><strong>Type of Emulsion & Stability:</strong> Clear identification of the emulsion type (O/W, W/O) and robust stability data are required. Phase separation is a critical failure.</li>
+                    <li><strong>Microbiological Purity:</strong> Extensive testing is needed due to the potential for contamination in jars.</li>
+                    <li><strong>Leaching & Packaging Compatibility:</strong> Proof that no harmful substances leach from the packaging (jar/tube) into the cream.</li>
+                    <li><strong>Justification of "Cosmeceutical" Claims:</strong> If the product claims to have effects beyond simple moisturization (e.g., anti-aging), strong evidence is required.</li>
+                </ul>`
+            },
+             ointment: {
+                title: 'Ointment',
+                description: 'Ointments are super thick, occlusive semisolid products. They are often anhydrous (waterless) or contain very little water, making them oily, waxy, and heavy. Their occlusive nature provides a protective seal over the skin.',
+                types: `<ul>
+                    <li>Primarily anhydrous, which reduces the risk of microbial contamination.</li>
+                    <li>Less aesthetic appeal due to greasy, sticky feel.</li>
+                    <li>Used for extremely dry skin areas or products needing moisture retention and protection, like some hair styling products or diaper rash ointments.</li>
+                </ul>`,
+                sfdaFocus: `<h4>SFDA Regulatory Considerations</h4>
+                <p>For ointments, the SFDA's focus is on:</p>
+                <ul>
+                    <li><strong>Purity of Raw Materials:</strong> High purity standards for petrolatum, waxes, and oils are expected to avoid contaminants.</li>
+                    <li><strong>Heavy Metal Testing:</strong> Mandatory testing for heavy metals like lead, arsenic, and mercury.</li>
+                    <li><strong>Occlusivity vs. Comedogenicity:</strong> While occlusive, the formulation should ideally be supported by data showing it is non-comedogenic if used on acne-prone areas.</li>
+                    <li><strong>Absence of Contaminants:</strong> Since they are often anhydrous, microbial risk is low, but the absence of chemical contaminants is paramount.</li>
+                </ul>`
+            },
+            paste: {
+                title: 'Paste',
+                description: 'Pastes are very thick semisolid formulations with a high solid content, making them stiff and difficult to spread. Toothpastes are a unique water-based exception.',
+                types: `<ul>
+                    <li><strong>Anhydrous Pastes:</strong> Based on a fatty vehicle, highly adhesive. Used for diaper rash products.</li>
+                    <li><strong>Aqueous Pastes (Toothpaste):</strong> Water-based formulations designed to clean and polish teeth.</li>
+                </ul>`,
+                sfdaFocus: `<h4>SFDA Regulatory Considerations</h4>
+                <p>SFDA regulations for pastes are distinct for each type:</p>
+                <ul>
+                    <li><strong>For Diaper Rash Pastes:</strong> Safety and concentration of active ingredients (like Zinc Oxide) must be within permitted levels. Must be proven non-irritating.</li>
+                    <li><strong>For Toothpastes:</strong> Fluoride content must be accurately declared and within the allowed cosmetic limits. Abrasivity must be tested to ensure it doesn't damage enamel. All claims (e.g., "whitening") need substantiation.</li>
+                </ul>`
+            },
+            gel: {
+                title: 'Gel',
+                description: 'Gels are semisolid systems where a gelling agent creates a stiff structure within a liquid phase. They contain a high amount of water and provide a cooling effect as the water evaporates.',
+                types: `<ul>
+                    <li><strong>Water-based:</strong> e.g., facial cleansers, after-sun gels.</li>
+                    <li><strong>Hydroalcoholic:</strong> e.g., hair styling gels, hand sanitizers.</li>
+                </ul>`,
+                sfdaFocus: `<h4>SFDA Regulatory Considerations</h4>
+                <p>When reviewing gels, the SFDA will check:</p>
+                <ul>
+                    <li><strong>Safety of Gelling Agent:</strong> The polymer used must be approved for cosmetic use. Residual monomer levels (e.g., acrylamide in carbomers) must be below SFDA limits.</li>
+                    <li><strong>pH and Skin Irritation:</strong> The final pH of the product must be in a range compatible with skin to avoid irritation.</li>
+                    <li><strong>Clarity and Stability:</strong> The gel should remain clear and its viscosity stable throughout its shelf life.</li>
+                    <li><strong>Alcohol Content (for sanitizers):</strong> Must meet specific efficacy standards for germ-killing claims.</li>
+                </ul>`
+            },
+            powder: {
+                title: 'Powder',
+                description: 'Powders are solid dosage forms composed of freely flowing dry solid chemicals. They can be loose or compressed.',
+                types: `<ul>
+                    <li><strong>Loose Powders:</strong> Free-flowing mixtures (e.g., baby powder, bath salts, finishing powders).</li>
+                    <li><strong>Pressed Powders:</strong> Made by compressing loose powders (e.g., eye shadows, blushes, bath bombs).</li>
+                </ul>`,
+                sfdaFocus: `<h4>SFDA Regulatory Considerations</h4>
+                <p>For powders, the SFDA has strict rules on:</p>
+                <ul>
+                    <li><strong>Absence of Asbestos:</strong> A major concern for talc-based powders. All talc must be certified asbestos-free.</li>
+                    <li><strong>Heavy Metal Limits:</strong> All pigments and raw materials must be tested for heavy metals.</li>
+                    <li><strong>Microbiological Contamination:</strong> Powders must be free from pathogenic microorganisms.</li>
+                    <li><strong>Inhalation Risk Assessment:</strong> For fine, loose powders, an assessment of inhalation safety may be required.</li>
+                </ul>`
+            },
+            capsule: {
+                title: 'Capsule',
+                description: 'In cosmetics, these are typically soft gelatin capsules containing an oily liquid. The capsule shell dissolves in water or is twisted open to release the contents.',
+                types: `<ul>
+                    <li><strong>Bath Oil Beads:</strong> Dissolve in bathwater to release fragrant oils.</li>
+                    <li><strong>Anti-aging Serum Capsules:</strong> Single-dose applications for potent serums, protecting them from air and light.</li>
+                </ul>`,
+                sfdaFocus: `<h4>SFDA Regulatory Considerations</h4>
+                <p>The SFDA's focus for cosmetic capsules includes:</p>
+                <ul>
+                    <li><strong>Capsule Shell Material:</strong> The gelatin or shell material must be of a safe, cosmetic, or food-grade origin (e.g., BSE-free).</li>
+                    <li><strong>Fill Stability:</strong> The oily content must be stable and not react with the capsule shell.</li>
+                    <li><strong>Single-Dose Volume:</strong> The amount in each capsule must be safe for a single application.</li>
+                    <li><strong>Clarity of Use:</strong> The packaging must clearly state that the capsules are for external use only and not for ingestion.</li>
+                </ul>`
+            },
+            stick: {
+                title: 'Stick',
+                description: 'A solid dosage form composed of waxes and oils, providing a convenient application without using fingers.',
+                types: `<ul>
+                    <li><strong>Lipsticks & Lip Liners:</strong> Color cosmetics.</li>
+                    <li><strong>Deodorant/Antiperspirant Sticks:</strong> Personal care products.</li>
+                </ul>`,
+                sfdaFocus: `<h4>SFDA Regulatory Considerations</h4>
+                <p>For stick products, the SFDA will verify:</p>
+                <ul>
+                    <li><strong>Melting Point & Stability:</strong> The product must remain solid at room temperature and during transport, but apply smoothly to the skin. "Sweating" (oil separation) is a stability issue.</li>
+                    <li><strong>Safety of Waxes and Colorants:</strong> All ingredients must be approved for their intended use (e.g., safe for lips).</li>
+                    <li><strong>Leaching from Packaging:</strong> The stick formula should not interact with or leach chemicals from its dispenser mechanism.</li>
+                    <li><strong>Efficacy of Actives:</strong> For antiperspirant sticks, claims must be supported by efficacy studies (e.g., sweat reduction tests).</li>
+                </ul>`
+            }
+        };
+
+        function toggleSubCategory(id) {
+            const element = document.getElementById(id);
+            const allGrids = document.querySelectorAll('.sub-category-grid');
+            
+            allGrids.forEach(grid => {
+                if(grid.id !== id) {
+                    grid.style.display = 'none';
+                }
+            });
+
+            if (element.style.display === 'grid') {
+                element.style.display = 'none';
+            } else {
+                element.style.display = 'grid';
+            }
+        }
+
+        function showModal(formType) {
+            const data = modalData[formType];
+            const modalContentArea = document.getElementById('modal-content-area');
+            
+            const contentHTML = `
+                <h3 class="modal-title">${data.title}</h3>
+                <div class="modal-content">
+                    <p>${data.description}</p>
+                    <h4 class="modal-section-title">Types & Examples</h4>
+                    ${data.types}
+                    <div class="sfda-focus">
+                        ${data.sfdaFocus}
+                    </div>
+                </div>
+            `;
+            
+            modalContentArea.innerHTML = contentHTML;
+            document.getElementById('modal-overlay').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('modal-overlay').classList.remove('active');
+        }
+        
+    </script>
+</body>
+</html>
+
